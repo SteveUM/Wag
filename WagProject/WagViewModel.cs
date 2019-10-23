@@ -35,6 +35,22 @@ namespace WagProject
             set { NotifyPropertyChanged(); }
         }
 
+        private bool isLogging;
+        public bool IsLogging
+        {
+            get {
+                return isLogging;
+            }
+            set {
+                if (isLogging == value)
+                {
+                    return;
+                }
+
+                isLogging = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string fileName;
 
@@ -61,10 +77,12 @@ namespace WagProject
             if (!TailViewModel.Running)
             {
                 TailViewModel.StartTail();
+                IsLogging = true;
             }
             else
             {
                 TailViewModel.StopTail();
+                IsLogging = false;
             }
         }
 

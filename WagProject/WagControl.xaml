@@ -16,6 +16,12 @@
         Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
     -->
 
+    <UserControl.Resources>
+        <Style x:Key="CellStyle" TargetType="DataGridCell">
+            <Setter Property="Background" Value="LightGreen"></Setter>
+        </Style>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -53,8 +59,7 @@
                 Height="20"
                 Margin="3"
                 Padding="0"
-                Click="ToggleLogging"
-                IsEnabled="{Binding EnableLogging}">
+                Click="ToggleLogging">
                 <Button.Content>
                     <Grid Margin="0">
                         <Polygon
@@ -75,8 +80,7 @@
                 Height="20"
                 Margin="3"
                 Padding="0"
-                Click="ToggleLogging"
-                IsEnabled="{Binding DisableLogging}">
+                Click="ToggleLogging">
                 <Button.Content>
                     <Grid Margin="0">
                         <Polygon
@@ -100,7 +104,8 @@
             AutoGenerateColumns="True"
             ColumnWidth="*"
             IsReadOnly="True"
-            ItemsSource="{Binding TailViewModel.LogData}" />
+            ItemsSource="{Binding TailViewModel.LogData}">
+            </DataGrid>
 
         <TextBlock
             Grid.Row="2"

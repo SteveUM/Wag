@@ -73,7 +73,7 @@ namespace WagProject
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await WagCommand.InitializeAsync(this);
-
+            
             LogMessage(nameof(Initialize));
         }
 
@@ -91,6 +91,17 @@ namespace WagProject
             var elapsed = DateTime.Now - _startLogging.Value;
             var txt = DateTime.Now.ToString("hh:mm:ss") + $" {elapsed.TotalMilliseconds,8:n1} MyExtensionLog {System.Threading.Thread.CurrentThread.ManagedThreadId,3} {msg}";
             Debug.WriteLine(txt);
+        }
+
+        /// <summary>
+        /// Handle the VS shutdown query and stop the log thread if it's running.
+        /// </summary>
+        /// <param name="canClose"></param>
+        /// <returns></returns>
+        protected override int QueryClose(out bool canClose)
+        {
+            WagCommand.StopLogging();
+            return base.QueryClose(out canClose);
         }
 
         #endregion

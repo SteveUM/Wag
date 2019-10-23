@@ -146,7 +146,7 @@ namespace WagProject
                     }
 
                     reader.BaseStream.Seek(EOFPosition, SeekOrigin.Begin);
-
+                    
                     while ((line = reader.ReadLine()) != null)
                     {
                         //Console.WriteLine(line);

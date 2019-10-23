@@ -97,5 +97,18 @@ namespace WagProject
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
+
+        /// <summary>
+        /// Force the command to stop the file logging. Typically used when VS is shutting down.
+        /// </summary>
+        public static void StopLogging()
+        {
+            
+            ToolWindowPane window = Instance.package.FindToolWindow(typeof(Wag), 0, true);
+            if(window != null)
+            {
+                ((WagViewModel)((System.Windows.FrameworkElement)window.Content).DataContext).TailViewModel.Running = false;
+            }
+        }
     }
 }
