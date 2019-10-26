@@ -3,26 +3,20 @@ using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Dynamic;
 using System.IO;
 using System.Threading;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace WagProject
 {
-    internal class LogDataCollection : BaseViewModel
-    {
-        string logEntry;
 
-        public string LogEntry
-        {
-            get {
-                return logEntry;
-            }
-            set {
-                logEntry = value;
-            }
-        }
+    internal class LogEntries : ObservableCollection<LogEntry>
+    {
+
     }
 
 
@@ -35,32 +29,55 @@ namespace WagProject
             Running = false;
             LastErrorMessage = "";
             LogData = new ObservableCollection<object>();
+            LogViewSource = CollectionViewSource.GetDefaultView(LogData);
+            FilterText = "";
+
+            LogViewSource.Filter = n => ((LogEntry)n).Entry.Contains(FilterText);
+        }
+
+        private string filterText;
+
+        public string FilterText
+        {
+            get { return filterText; }
+            set
+            {
+                filterText = value;
+                LogViewSource.Filter = n => ((LogEntry)n).Entry.Contains(FilterText);
+            }
         }
 
         public string FileName { get; set; }
-
 
         private bool running;
 
         public bool Running
         {
             get { return running; }
-            set {
+            set
+            {
                 running = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public string LastErrorMessage { get; set; }
+        private string lastErrorMessage;
+
+        public string LastErrorMessage
+        {
+            get { return lastErrorMessage; }
+            set { lastErrorMessage = value; NotifyPropertyChanged(); }
+        }
 
         public void StartTail()
         {
             if (!File.Exists(FileName))
             {
-                LastErrorMessage = "File does not exist";
+                LastErrorMessage = $"File: {FileName} does not exist";
             }
             else
             {
+                LastErrorMessage = $"Tailing file {Path.GetFileName(FileName)}";
                 if (LogData == null)
                 {
                     LogData = new ObservableCollection<object>();
@@ -78,17 +95,28 @@ namespace WagProject
 
         public void StopTail()
         {
+            LastErrorMessage = "";
             Running = false;
+        }
+
+        private ICollectionView logViewSource;
+
+        public ICollectionView LogViewSource
+        {
+            get { return logViewSource; }
+            set { logViewSource = value; NotifyPropertyChanged(); }
         }
 
         private ObservableCollection<object> logData;
 
         public ObservableCollection<object> LogData
         {
-            get {
+            get
+            {
                 return logData;
             }
-            set {
+            set
+            {
                 logData = value;
                 NotifyPropertyChanged();
             }
@@ -106,15 +134,6 @@ namespace WagProject
             //}
             //return;
 
-            
-
-            //FileInfo fi = new FileInfo(FileName);
-            //if(fi.Extension.ToLower() == "csv")
-            //{
-                
-
-            //}
-
 
             //https://www.codeproject.com/Articles/7568/Tail-NET
             using (StreamReader reader = new StreamReader(new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
@@ -124,12 +143,13 @@ namespace WagProject
                 // read the existing file content
                 ThreadHelper.JoinableTaskFactory.Run(async delegate
                 {
-                    while ((line = reader.ReadLine()) != null)
+                    while ((line = await reader.ReadLineAsync()) != null)
                     {
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(); // Switch to main thread
-                        LogData.Add(new LogDataCollection() { LogEntry = line });
-                        NotifyPropertyChanged("LogData");
+                        LogData.Add(new LogEntry() { Entry = line });
+                        //NotifyPropertyChanged("LogData");
                     }
+                    NotifyPropertyChanged("LogData");
                 });
 
 
@@ -146,15 +166,15 @@ namespace WagProject
                     }
 
                     reader.BaseStream.Seek(EOFPosition, SeekOrigin.Begin);
-                    
+
                     while ((line = reader.ReadLine()) != null)
                     {
                         //Console.WriteLine(line);
                         ThreadHelper.JoinableTaskFactory.Run(async delegate
                         {
                             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(); // Switch to main thread
-                            LogData.Add(new LogDataCollection() { LogEntry = line });
-                            NotifyPropertyChanged("LogData");
+                            LogData.Add(new LogEntry() { Entry = line });
+                            //NotifyPropertyChanged("LogData");
                         });
                     }
 

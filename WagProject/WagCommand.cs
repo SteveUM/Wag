@@ -107,6 +107,7 @@ namespace WagProject
             ToolWindowPane window = Instance.package.FindToolWindow(typeof(Wag), 0, true);
             if(window != null)
             {
+                // shutdown the tail thread
                 ((WagViewModel)((System.Windows.FrameworkElement)window.Content).DataContext).TailViewModel.Running = false;
             }
         }

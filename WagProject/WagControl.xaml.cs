@@ -16,7 +16,7 @@
         /// Initializes a new instance of the <see cref="WagControl"/> class.
         /// </summary>
         public WagControl()
-        {
+        {  
             this.InitializeComponent();
             ViewModel = new WagViewModel();
             ViewModel.TailViewModel.LogData.CollectionChanged += LogData_CollectionChanged;
@@ -58,6 +58,22 @@
         private void SelectFileClick(object sender, RoutedEventArgs e)
         {
             ViewModel.SelectLogFile();
+        }
+
+        private void CollectionViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        {
+
+        }
+
+        private void filterTextChanged(object sender, TextChangedEventArgs e)
+        {
+            ViewModel.TailViewModel.FilterText = filterTextBox.Text;
+        }
+
+        private void ClearFilterClick(object sender, RoutedEventArgs e)
+        {
+            filterTextBox.Text = "";
+            ViewModel.TailViewModel.FilterText = "";
         }
     }
 }
