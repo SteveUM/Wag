@@ -67,12 +67,12 @@
 
         private void filterTextChanged(object sender, TextChangedEventArgs e)
         {
-            ViewModel.TailViewModel.FilterText = filterTextBox.Text;
+            ViewModel.TailViewModel.FilterText = xfilterTextBox.Text;
         }
 
         private void ClearFilterClick(object sender, RoutedEventArgs e)
         {
-            filterTextBox.Text = "";
+            xfilterTextBox.Text = "";
             ViewModel.TailViewModel.FilterText = "";
         }
     }

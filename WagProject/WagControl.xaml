@@ -4,13 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vsp="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:wp="clr-namespace:WagProject"
     Name="MyToolWindow"
     d:DesignHeight="300"
     d:DesignWidth="500"
-    Background="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}"
-    Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+    Background="{DynamicResource {x:Static vsp:EnvironmentColors.ToolboxBackgroundBrushKey}}"
+    Foreground="{DynamicResource {x:Static vsp:EnvironmentColors.ToolboxContentBrushKey}}"
     mc:Ignorable="d">
 
     <!--
@@ -19,9 +20,11 @@
     -->
 
     <UserControl.Resources>
-        <Style x:Key="CellStyle" TargetType="DataGridCell">
+        <!--<Style x:Key="CellStyle" TargetType="DataGridCell">
             <Setter Property="Background" Value="LightGreen" />
-        </Style>
+        </Style>-->
+
+
         <!--<wp:LogEntries x:Key="entries" />
         <CollectionViewSource
             x:Key="logEntries"
@@ -47,8 +50,90 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
-        <!--<StackPanel Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}" Orientation="Horizontal">-->
-        <StackPanel Background="{DynamicResource {x:Static vsshell:VsBrushes.ToolboxBackgroundKey}}" Orientation="Horizontal">
+
+        <ToolBarTray Grid.Row="0">
+            <ToolBar>
+
+                <Button>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox
+                            x:Name="xlogFileText"
+                            Width="200"
+                            Height="20"
+                            Margin="0"
+                            Text="{Binding FileName}" />
+                        <Button
+                            x:Name="xloadFileButton"
+                            Width="20"
+                            Height="20"
+                            Margin="0"
+                            BorderBrush="{x:Null}"
+                            Click="SelectFileClick">
+                            ...
+                        </Button>
+                    </StackPanel>
+                </Button>
+
+                <Button
+                    x:Name="xstartMonitorButton"
+                    Width="20"
+                    Height="20"
+                    Margin="0"
+                    Padding="0"
+                    BorderBrush="{x:Null}"
+                    Click="ToggleLogging">
+                    <Button.Content>
+                        <Grid Margin="0">
+                            <Polygon
+                                Width="20"
+                                Height="20"
+                                Margin="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Fill="Green"
+                                Points="5,5 15,10 5,15" />
+                        </Grid>
+                    </Button.Content>
+                </Button>
+                <Separator />
+                <Button>
+                    <TextBox
+                        x:Name="xfilterTextBox"
+                        Width="100"
+                        Margin="0"
+                        TextChanged="filterTextChanged"
+                        ToolTip="Enter text to filter displayed rows" />
+                </Button>
+                <Button
+                    x:Name="xclearFilterBtn"
+                    Width="20"
+                    Margin="0"
+                    BorderBrush="{x:Null}"
+                    Click="ClearFilterClick"
+                    ToolTip="Clear filter">
+                    <Button.Content>
+                        <Grid Margin="0">
+                            <Path
+                                Width="20"
+                                Height="20"
+                                Margin="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Stroke="Red"
+                                StrokeThickness="2">
+                                <Path.Data>M 5,5 15,15 M 15,5 5,15</Path.Data>
+                            </Path>
+                        </Grid>
+                    </Button.Content>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!--<StackPanel
+            Grid.Row="2"
+            Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
+            Orientation="Horizontal">
+
             <TextBlock
                 x:Name="fileLabel"
                 Grid.Row="0"
@@ -69,6 +154,8 @@
                 Width="20"
                 Height="20"
                 Margin="0,5,0,5"
+                Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
+                BorderBrush="{x:Null}"
                 Click="SelectFileClick">
                 ...
             </Button>
@@ -78,6 +165,8 @@
                 Height="20"
                 Margin="0"
                 Padding="0"
+                Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
+                BorderBrush="{x:Null}"
                 Click="ToggleLogging">
                 <Button.Content>
                     <Grid Margin="0">
@@ -112,6 +201,8 @@
                     x:Name="clearFilterBtn"
                     Width="20"
                     Margin="0,5,5,5"
+                    Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
+                    BorderBrush="{x:Null}"
                     Click="ClearFilterClick"
                     ToolTip="Clear filter">
                     <Button.Content>
@@ -130,7 +221,8 @@
                     </Button.Content>
                 </Button>
             </StackPanel>
-            <!--<ToggleButton
+        -->
+        <!--<ToggleButton
                 x:Name="filterButton"
                 Width="20"
                 Height="20"
@@ -150,7 +242,7 @@
                     </Grid>
                 </ToggleButton.Content>
             </ToggleButton>-->
-            <!--<Button
+        <!--<Button
                 x:Name="stopMonitorButton"
                 Width="20"
                 Height="20"
@@ -170,7 +262,7 @@
                     </Grid>
                 </Button.Content>
             </Button>-->
-            <!--<Button
+        <!--<Button
                 x:Name="stopMonitorButton"
                 Width="20"
                 Height="20"
@@ -190,7 +282,8 @@
                     </Grid>
                 </Button.Content>
             </Button>-->
-        </StackPanel>
+        <!--
+        </StackPanel>-->
         <!--<DataGrid
             x:Name="logFileDataTable"
             Grid.Row="1"
@@ -209,7 +302,14 @@
             ColumnWidth="*"
             HeadersVisibility="None"
             IsReadOnly="True"
-            ItemsSource="{Binding TailViewModel.LogViewSource}" />
+            ItemsSource="{Binding TailViewModel.LogViewSource}">
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0.1" />
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                </Style>
+            </DataGrid.CellStyle>
+        </DataGrid>
         <TextBox
             x:Name="statusText"
             Grid.Row="2"
