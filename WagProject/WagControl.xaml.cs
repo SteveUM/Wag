@@ -67,7 +67,7 @@
 
         private void filterTextChanged(object sender, TextChangedEventArgs e)
         {
-            ViewModel.TailViewModel.FilterText = xfilterTextBox.Text;
+            ViewModel.TailViewModel.FilterText = ViewModel.Highlight ? "" : xfilterTextBox.Text;
         }
 
         private void ClearFilterClick(object sender, RoutedEventArgs e)

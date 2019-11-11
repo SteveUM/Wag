@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WagStandalone.Properties
+namespace WagLib.Properties
 {
 
 

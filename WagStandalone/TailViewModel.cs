@@ -1,63 +1,86 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
+using System.Dynamic;
 using System.IO;
 using System.Threading;
+using System.Windows;
+using System.Windows.Data;
 using System.Windows.Threading;
 
-namespace WagStandalone
+namespace WagLib
 {
-
-    internal class LogDataCollection : BaseViewModel
-    {
-        string logEntry;
-
-        public string LogEntry
-        {
-            get {
-                return logEntry;
-            }
-            set {
-                logEntry = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
 
     internal sealed class TailViewModel : BaseViewModel
     {
+        const int FILE_READ_DELAY = 100;
+
         public TailViewModel()
         {
             Running = false;
             LastErrorMessage = "";
-            //LogData = new ObservableCollection<LogDataCollection>();    //BuildTable();
+            LogData = new ObservableCollection<LogEntry>();
+            LogViewSource = CollectionViewSource.GetDefaultView(LogData);
+            FilterText = "";
+
+            LogViewSource.Filter = n => ((LogEntry)n).Entry.Contains(FilterText);
+        }
+
+        private string filterText;
+
+        public string FilterText
+        {
+            get { return filterText; }
+            set
+            {
+                filterText = value;
+                LogViewSource.Filter = n => ((LogEntry)n).Entry.Contains(FilterText);
+            }
         }
 
         public string FileName { get; set; }
 
-        public bool Running { get; private set; }
+        private bool running;
 
-        public string LastErrorMessage { get; set; }
+        public bool Running
+        {
+            get { return running; }
+            set
+            {
+                running = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string lastErrorMessage;
+
+        public string LastErrorMessage
+        {
+            get { return lastErrorMessage; }
+            set { lastErrorMessage = value; NotifyPropertyChanged(); }
+        }
 
         public void StartTail()
         {
             if (!File.Exists(FileName))
             {
-                LastErrorMessage = "File does not exist";
+                LastErrorMessage = $"File: {FileName} does not exist";
             }
             else
             {
+                LastErrorMessage = $"Tailing file {Path.GetFileName(FileName)}";
                 if (LogData == null)
                 {
-                    LogData = new ObservableCollection<LogDataCollection>();
+                    LogData = new ObservableCollection<LogEntry>();
                 }
                 LogData?.Clear();
 
                 Thread t = new Thread(() =>
                 {
                     Running = true;
-                    TailFile();
+                    TailFileAsync();
                 });
                 t.Start();
             }
@@ -65,32 +88,36 @@ namespace WagStandalone
 
         public void StopTail()
         {
+            LastErrorMessage = "";
             Running = false;
         }
 
-        //private DataTable logData;
+        private ICollectionView logViewSource;
 
-        //public DataTable LogData
-        //{
-        //    get { return logData; }
-        //    set {
-        //        logData = value;
-        //       // NotifyPropertyChanged();
-        //    }
-        //}
-        ObservableCollection<LogDataCollection> logData;
-
-        public ObservableCollection<LogDataCollection> LogData
+        public ICollectionView LogViewSource
         {
-            get {
-                return logData;
-            }
-            set {
-                logData = value;
+            get { return logViewSource; }
+            set
+            {
+                logViewSource = value;
                 NotifyPropertyChanged();
             }
         }
 
+        private ObservableCollection<LogEntry> logData;
+
+        public ObservableCollection<LogEntry> LogData
+        {
+            get
+            {
+                return logData;
+            }
+            set
+            {
+                logData = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private DataTable BuildTable()
         {
@@ -106,62 +133,90 @@ namespace WagStandalone
             return dt;
         }
 
-        private void TailFile()
+        public bool LoadComplete { get; set; }
+
+        private async void TailFileAsync()
         {
-
-            //while (Running)
-            //{
-            //    Thread.Sleep(2000);
-            //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            //    {
-            //        LogData.Add(new LogDataCollection() { LogEntry = "asdfasdfasdfasdf..." });
-            //        NotifyPropertyChanged("LogData");
-            //    });
-
-            //    //LogData.Rows.Add(LogData.NewRow()["data"] = "asefasdf");
-            //    //LogData = LogData;
-            //    //NotifyPropertyChanged("LogData");
-
-            //}
-            //return;
-
-
             //https://www.codeproject.com/Articles/7568/Tail-NET
             using (StreamReader reader = new StreamReader(new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
-                //start at the end of the file
-                long lastMaxOffset = reader.BaseStream.Length;
+                string line = string.Empty;
 
+#if STANDALONE
+                while ((line = reader.ReadLine()) != null)
+                {
+                    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                    {
+                        LogData.Add(new LogEntry() { Entry = line });
+                    }));
+                }
+                NotifyPropertyChanged("LogData");
+                NotifyPropertyChanged("LogViewSource");
+#else
+
+                // read the existing file content
+                ThreadHelper.JoinableTaskFactory.Run(async delegate
+                {
+                    while ((line = await reader.ReadLineAsync()) != null)
+                    {
+                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(); // Switch to main thread
+                        LogData.Add(new LogEntry() { Entry = line });
+                        //NotifyPropertyChanged("LogData");
+                    }
+                    NotifyPropertyChanged("LogData");
+                });
+#endif
+
+                long EOFPosition = reader.BaseStream.Length;
+
+                // tail the file
                 while (Running)
                 {
-                    Thread.Sleep(100);
-
-
-                    //if the file size has not changed, idle
-                    if (reader.BaseStream.Length == lastMaxOffset)
-                        continue;
-
-                    //seek to the last max offset
-                    reader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
-
-                    //read out of the file until the EOF
-                    string line = string.Empty;
-                    while ((line = reader.ReadLine()) != null)
+                    Thread.Sleep(FILE_READ_DELAY);
+                    if (reader.BaseStream.Length == EOFPosition)
                     {
-                        Console.WriteLine(line);
-                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            LogData.Add(new LogDataCollection() { LogEntry =line });
-                            NotifyPropertyChanged("LogData");
-                        });
+                        continue;
                     }
 
-                    //update the last max offset
-                    lastMaxOffset = reader.BaseStream.Position;
+                    reader.BaseStream.Seek(EOFPosition, SeekOrigin.Begin);
+#if STANDALONE
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                        {
+                            LogData.Add(new LogEntry() { Entry = line });
+                        }));
+                    }
+                    NotifyPropertyChanged("LogViewSource");
+#else
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        //Console.WriteLine(line);
+                        ThreadHelper.JoinableTaskFactory.Run(async delegate
+                        {
+                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(); // Switch to main thread
+                            LogData.Add(new LogEntry() { Entry = line });
+                            //NotifyPropertyChanged("LogData");
+                        });
+                    }
+#endif
+                    EOFPosition = reader.BaseStream.Position;
                 }
             }
         }
 
-
+        public static void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+        {
+            // ExpandoObject supports IDictionary so we can extend it like this
+            var expandoDict = expando as IDictionary<string, object>;
+            if (expandoDict.ContainsKey(propertyName))
+            {
+                expandoDict[propertyName] = propertyValue;
+            }
+            else
+            {
+                expandoDict.Add(propertyName, propertyValue);
+            }
+        }
     }
 }

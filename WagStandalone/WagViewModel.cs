@@ -1,19 +1,15 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Linq;
+﻿using System.Collections;
 using System.Windows.Forms;
-using System.Windows.Media;
 
-namespace WagStandalone
+namespace WagLib
 {
     internal sealed class WagViewModel : BaseViewModel
     {
         public WagViewModel()
         {
             TailViewModel = new TailViewModel();
-            ButtonBackground = Colors.White;
+            IsLogging = false;
         }
-
 
         private TailViewModel tailViewModel;
 
@@ -25,8 +21,6 @@ namespace WagStandalone
                 NotifyPropertyChanged();
             }
         }
-
-        public Color ButtonBackground { get; set; }
 
         public bool EnableLogging
         {
@@ -40,6 +34,22 @@ namespace WagStandalone
             set { NotifyPropertyChanged(); }
         }
 
+        private bool isLogging;
+        public bool IsLogging
+        {
+            get {
+                return isLogging;
+            }
+            set {
+                if (isLogging == value)
+                {
+                    return;
+                }
+
+                isLogging = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string fileName;
 
@@ -61,9 +71,43 @@ namespace WagStandalone
             }
         }
 
+        internal void ToggleLogging()
+        {
+            if (!TailViewModel.Running)
+            {
+                TailViewModel.StartTail();
+                IsLogging = true;
+            }
+            else
+            {
+                TailViewModel.StopTail();
+                IsLogging = false;
+            }
+        }
 
+        private bool highlight;
 
+        public bool Highlight
+        {
+            get { return highlight; }
+            set { highlight = value; NotifyPropertyChanged(); }
+        }
 
+        private string filterText;
+
+        public string FilterText
+        {
+            get { return filterText; }
+            set { filterText = value; NotifyPropertyChanged(); }
+        }
+
+        private Queue filterHistory = new Queue(10);
+
+        public Queue FilterHistory
+        {
+            get { return filterHistory; }
+            set { filterHistory = value; }
+        }
 
     }
 }

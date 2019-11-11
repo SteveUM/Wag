@@ -10,6 +10,7 @@ namespace WagProject
         public WagViewModel()
         {
             TailViewModel = new TailViewModel();
+            IsLogging = false;
         }
 
 
@@ -87,6 +88,21 @@ namespace WagProject
             }
         }
 
+        private bool highlight;
+
+        public bool Highlight
+        {
+            get { return highlight; }
+            set { highlight = value; NotifyPropertyChanged(); }
+        }
+
+        private string filterText;
+
+        public string FilterText
+        {
+            get { return filterText; }
+            set { filterText = value; NotifyPropertyChanged(); }
+        }
 
 
 

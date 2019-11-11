@@ -1,14 +1,10 @@
 ﻿using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Dynamic;
 using System.IO;
 using System.Threading;
-using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace WagProject

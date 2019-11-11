@@ -20,28 +20,47 @@
     -->
 
     <UserControl.Resources>
-        <!--<Style x:Key="CellStyle" TargetType="DataGridCell">
-            <Setter Property="Background" Value="LightGreen" />
-        </Style>-->
 
-
-        <!--<wp:LogEntries x:Key="entries" />
-        <CollectionViewSource
-            x:Key="logEntries"
-            Filter="CollectionViewSource_Filter"
-            Source="{StaticResource entries}" />-->
-
-        <!--<Style TargetType="{x:Type ToolTip}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToolTip">
-                        <Grid>
-
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
+        <Style x:Key="startLogStyle" TargetType="{x:Type Button}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsLogging}" Value="false">
+                    <DataTrigger.Setters>
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <Grid Margin="0">
+                                    <Polygon
+                                        Width="20"
+                                        Height="20"
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Fill="Green"
+                                        Points="5,5 15,10 5,15" />
+                                </Grid>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger.Setters>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=IsLogging}" Value="true">
+                    <DataTrigger.Setters>
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <Grid Margin="0">
+                                    <Polygon
+                                        Width="20"
+                                        Height="20"
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Fill="Red"
+                                        Points="5,5 15,5 15,15 5,15" />
+                                </Grid>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger.Setters>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -61,49 +80,53 @@
                             Width="200"
                             Height="20"
                             Margin="0"
-                            Text="{Binding FileName}" />
+                            IsReadOnly="True"
+                            Text="{Binding FileName}"
+                            ToolTip="Name of the file to tail" />
                         <Button
                             x:Name="xloadFileButton"
                             Width="20"
                             Height="20"
                             Margin="0"
                             BorderBrush="{x:Null}"
-                            Click="SelectFileClick">
+                            Click="SelectFileClick"
+                            ToolTip="Select the file to log"
+                            UseLayoutRounding="False">
+                            <Button.Background>
+                                <ImageBrush />
+                            </Button.Background>
                             ...
+                        </Button>
+
+                        <Button
+                            x:Name="xstartMonitorButton"
+                            Width="20"
+                            Height="20"
+                            Margin="0"
+                            Padding="0"
+                            BorderBrush="{x:Null}"
+                            Click="ToggleLogging"
+                            Style="{StaticResource startLogStyle}"
+                            ToolTip="Start/stop file tail">
+                            <Button.Background>
+                                <ImageBrush />
+                            </Button.Background>
                         </Button>
                     </StackPanel>
                 </Button>
 
-                <Button
-                    x:Name="xstartMonitorButton"
-                    Width="20"
-                    Height="20"
-                    Margin="0"
-                    Padding="0"
-                    BorderBrush="{x:Null}"
-                    Click="ToggleLogging">
-                    <Button.Content>
-                        <Grid Margin="0">
-                            <Polygon
-                                Width="20"
-                                Height="20"
-                                Margin="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Fill="Green"
-                                Points="5,5 15,10 5,15" />
-                        </Grid>
-                    </Button.Content>
-                </Button>
                 <Separator />
+
                 <Button>
                     <TextBox
                         x:Name="xfilterTextBox"
                         Width="100"
                         Margin="0"
+                        Text="{Binding FilterText}"
                         TextChanged="filterTextChanged"
                         ToolTip="Enter text to filter displayed rows" />
                 </Button>
+
                 <Button
                     x:Name="xclearFilterBtn"
                     Width="20"
@@ -126,173 +149,15 @@
                         </Grid>
                     </Button.Content>
                 </Button>
+
+                <Button>
+                    <CheckBox IsChecked="{Binding Highlight, Mode=TwoWay}" ToolTip="Filter or Highlight" />
+                </Button>
+
+
             </ToolBar>
         </ToolBarTray>
 
-        <!--<StackPanel
-            Grid.Row="2"
-            Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
-            Orientation="Horizontal">
-
-            <TextBlock
-                x:Name="fileLabel"
-                Grid.Row="0"
-                Margin="5"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Visibility="Collapsed">
-                File:
-            </TextBlock>
-            <TextBox
-                x:Name="logFileText"
-                Width="200"
-                Height="20"
-                Margin="5,5,0,5"
-                Text="{Binding FileName}" />
-            <Button
-                x:Name="loadFileButton"
-                Width="20"
-                Height="20"
-                Margin="0,5,0,5"
-                Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
-                BorderBrush="{x:Null}"
-                Click="SelectFileClick">
-                ...
-            </Button>
-            <Button
-                x:Name="startMonitorButton"
-                Width="20"
-                Height="20"
-                Margin="0"
-                Padding="0"
-                Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
-                BorderBrush="{x:Null}"
-                Click="ToggleLogging">
-                <Button.Content>
-                    <Grid Margin="0">
-                        <Polygon
-                            Width="20"
-                            Height="20"
-                            Margin="0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Fill="Green"
-                            Points="5,5 15,10 5,15" />
-                    </Grid>
-                </Button.Content>
-            </Button>
-            <TextBlock
-                x:Name="filterLabel"
-                Grid.Row="0"
-                Margin="5"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Visibility="Collapsed">
-                Filter:
-            </TextBlock>
-            <StackPanel Orientation="Horizontal">
-                <TextBox
-                    x:Name="filterTextBox"
-                    Width="100"
-                    Margin="5,5,0,5"
-                    TextChanged="filterTextChanged"
-                    ToolTip="Enter text to filter displayed rows" />
-                <Button
-                    x:Name="clearFilterBtn"
-                    Width="20"
-                    Margin="0,5,5,5"
-                    Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}"
-                    BorderBrush="{x:Null}"
-                    Click="ClearFilterClick"
-                    ToolTip="Clear filter">
-                    <Button.Content>
-                        <Grid Margin="0">
-                            <Path
-                                Width="20"
-                                Height="20"
-                                Margin="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Stroke="Red"
-                                StrokeThickness="2">
-                                <Path.Data>M 5,5 15,15 M 15,5 5,15</Path.Data>
-                            </Path>
-                        </Grid>
-                    </Button.Content>
-                </Button>
-            </StackPanel>
-        -->
-        <!--<ToggleButton
-                x:Name="filterButton"
-                Width="20"
-                Height="20"
-                Margin="3"
-                Padding="0">
-
-                <ToggleButton.Content>
-                    <Grid Margin="0">
-                        <Polygon
-                            Width="20"
-                            Height="20"
-                            Margin="0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Fill="CornflowerBlue"
-                            Points="5,5 15,5 12,8 11,15 9,15 8,8" />
-                    </Grid>
-                </ToggleButton.Content>
-            </ToggleButton>-->
-        <!--<Button
-                x:Name="stopMonitorButton"
-                Width="20"
-                Height="20"
-                Margin="3"
-                Padding="0"
-                Click="ToggleLogging">
-                <Button.Content>
-                    <Grid Margin="0">
-                        <Polygon
-                            Width="20"
-                            Height="20"
-                            Margin="0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Fill="Red"
-                            Points="5,5 15,5 15,15 5,15" />
-                    </Grid>
-                </Button.Content>
-            </Button>-->
-        <!--<Button
-                x:Name="stopMonitorButton"
-                Width="20"
-                Height="20"
-                Margin="3"
-                Padding="0"
-                Click="ToggleLogging">
-                <Button.Content>
-                    <Grid Margin="0">
-                        <Polygon
-                            Width="20"
-                            Height="20"
-                            Margin="0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Fill="Red"
-                            Points="5,5 15,5 15,15 5,15" />
-                    </Grid>
-                </Button.Content>
-            </Button>-->
-        <!--
-        </StackPanel>-->
-        <!--<DataGrid
-            x:Name="logFileDataTable"
-            Grid.Row="1"
-            Margin="3"
-            AutoGenerateColumns="True"
-            ColumnWidth="*"
-            HeadersVisibility="None"
-            IsReadOnly="True"
-            ItemsSource="{Binding TailViewModel.LogData}" />-->
         <DataGrid
             x:Name="logFileDataTable"
             Grid.Row="1"
@@ -303,11 +168,22 @@
             HeadersVisibility="None"
             IsReadOnly="True"
             ItemsSource="{Binding TailViewModel.LogViewSource}">
+            <!--<DataGrid.Columns>
+                <DataGridTextColumn Header="Line" Binding="{Binding}" Width="*"></DataGridTextColumn>
+            </DataGrid.Columns>-->
             <DataGrid.CellStyle>
-                <Style TargetType="DataGridCell">
+                <!--<Style TargetType="DataGridCell">
                     <Setter Property="BorderThickness" Value="0.1" />
                     <Setter Property="BorderBrush" Value="LightGray" />
+                </Style>-->
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=Highlight}" Value="true">
+                            <Setter Property="Background" Value="LightBlue" />
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
+
             </DataGrid.CellStyle>
         </DataGrid>
         <TextBox

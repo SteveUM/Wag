@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WagStandalone
+namespace WagLib
 {
     internal class BaseViewModel : INotifyPropertyChanged
     {
