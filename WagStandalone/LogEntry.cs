@@ -1,6 +1,6 @@
 ﻿namespace WagLib
 {
-    internal class LogEntry : BaseViewModel
+    public class LogEntry : BaseViewModel
     {
         public LogEntry()
         {

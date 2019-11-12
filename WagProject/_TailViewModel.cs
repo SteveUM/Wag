@@ -10,17 +10,17 @@ using System.Windows.Data;
 namespace WagProject
 {
 
-    internal class LogEntries : ObservableCollection<LogEntry>
+    internal class LogEntries : ObservableCollection<_LogEntry>
     {
 
     }
 
 
-    internal sealed class TailViewModel : BaseViewModel
+    internal sealed class _TailViewModel : _BaseViewModel
     {
         const int FILE_READ_DELAY = 100;
 
-        public TailViewModel()
+        public _TailViewModel()
         {
             Running = false;
             LastErrorMessage = "";
@@ -28,7 +28,7 @@ namespace WagProject
             LogViewSource = CollectionViewSource.GetDefaultView(LogData);
             FilterText = "";
 
-            LogViewSource.Filter = n => ((LogEntry)n).Entry.Contains(FilterText);
+            LogViewSource.Filter = n => ((_LogEntry)n).Entry.Contains(FilterText);
         }
 
         private string filterText;
@@ -39,7 +39,7 @@ namespace WagProject
             set
             {
                 filterText = value;
-                LogViewSource.Filter = n => ((LogEntry)n).Entry.Contains(FilterText);
+                LogViewSource.Filter = n => ((_LogEntry)n).Entry.Contains(FilterText);
             }
         }
 
@@ -142,7 +142,7 @@ namespace WagProject
                     while ((line = await reader.ReadLineAsync()) != null)
                     {
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(); // Switch to main thread
-                        LogData.Add(new LogEntry() { Entry = line });
+                        LogData.Add(new _LogEntry() { Entry = line });
                         //NotifyPropertyChanged("LogData");
                     }
                     NotifyPropertyChanged("LogData");
@@ -169,7 +169,7 @@ namespace WagProject
                         ThreadHelper.JoinableTaskFactory.Run(async delegate
                         {
                             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(); // Switch to main thread
-                            LogData.Add(new LogEntry() { Entry = line });
+                            LogData.Add(new _LogEntry() { Entry = line });
                             //NotifyPropertyChanged("LogData");
                         });
                     }

@@ -5,18 +5,18 @@ using System.Windows.Forms;
 
 namespace WagProject
 {
-    internal sealed class WagViewModel : BaseViewModel
+    internal sealed class _WagViewModel : _BaseViewModel
     {
-        public WagViewModel()
+        public _WagViewModel()
         {
-            TailViewModel = new TailViewModel();
+            TailViewModel = new _TailViewModel();
             IsLogging = false;
         }
 
 
-        private TailViewModel tailViewModel;
+        private _TailViewModel tailViewModel;
 
-        public TailViewModel TailViewModel
+        public _TailViewModel TailViewModel
         {
             get { return tailViewModel; }
             set {

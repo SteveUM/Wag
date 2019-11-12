@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace WagProject
 {
-    internal class BaseViewModel : INotifyPropertyChanged
+    internal class _BaseViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

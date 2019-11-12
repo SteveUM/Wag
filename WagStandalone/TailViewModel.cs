@@ -13,7 +13,7 @@ using System.Windows.Threading;
 namespace WagLib
 {
 
-    internal sealed class TailViewModel : BaseViewModel
+    public sealed class TailViewModel : BaseViewModel
     {
         const int FILE_READ_DELAY = 100;
 

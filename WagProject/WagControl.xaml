@@ -122,8 +122,9 @@
                         x:Name="xfilterTextBox"
                         Width="100"
                         Margin="0"
+                        KeyDown="XfilterTextBox_KeyDown"
+                        LostFocus="XfilterTextBox_LostFocus"
                         Text="{Binding FilterText}"
-                        TextChanged="filterTextChanged"
                         ToolTip="Enter text to filter displayed rows" />
                 </Button>
 
@@ -162,29 +163,26 @@
             x:Name="logFileDataTable"
             Grid.Row="1"
             Margin="3"
-            AutoGenerateColumns="True"
+            AutoGenerateColumns="False"
             CanUserAddRows="False"
             ColumnWidth="*"
             HeadersVisibility="None"
             IsReadOnly="True"
             ItemsSource="{Binding TailViewModel.LogViewSource}">
-            <!--<DataGrid.Columns>
-                <DataGridTextColumn Header="Line" Binding="{Binding}" Width="*"></DataGridTextColumn>
-            </DataGrid.Columns>-->
-            <DataGrid.CellStyle>
-                <!--<Style TargetType="DataGridCell">
-                    <Setter Property="BorderThickness" Value="0.1" />
-                    <Setter Property="BorderBrush" Value="LightGray" />
-                </Style>-->
-                <Style TargetType="DataGridCell">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Entry}" Header="Entries" />
+            </DataGrid.Columns>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Path=Highlight}" Value="true">
-                            <Setter Property="Background" Value="LightBlue" />
+                        <DataTrigger Binding="{Binding Match}" Value="True">
+                            <Setter Property="Background" Value="Yellow" />
+                            <Setter Property="Foreground" Value="Black" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
+            </DataGrid.RowStyle>
 
-            </DataGrid.CellStyle>
         </DataGrid>
         <TextBox
             x:Name="statusText"

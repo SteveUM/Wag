@@ -1,6 +1,6 @@
 ﻿namespace WagProject
 {
-    internal class LogEntry : BaseViewModel
+    internal class _LogEntry : _BaseViewModel
     {
         string entry;
 

@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
+using WagLib;
 using Task = System.Threading.Tasks.Task;
 
 namespace WagProject

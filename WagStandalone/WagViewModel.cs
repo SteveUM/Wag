@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace WagLib
 {
-    internal sealed class WagViewModel : BaseViewModel
+    public sealed class WagViewModel : BaseViewModel
     {
         public WagViewModel()
         {
@@ -61,7 +61,7 @@ namespace WagLib
                 NotifyPropertyChanged(); }
         }
 
-        internal void SelectLogFile()
+        public void SelectLogFile()
         {
             System.Windows.Forms.OpenFileDialog ofd = new System.Windows.Forms.OpenFileDialog();
             DialogResult result;
@@ -71,7 +71,7 @@ namespace WagLib
             }
         }
 
-        internal void ToggleLogging()
+        public void ToggleLogging()
         {
             if (!TailViewModel.Running)
             {

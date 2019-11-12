@@ -3,13 +3,17 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Controls;
+
+    using System.Windows.Input;
     using System.Windows.Media;
+    using WagLib;
 
     /// <summary>
     /// Interaction logic for WagControl.
     /// </summary>
     public partial class WagControl : UserControl
     {
+        //internal WagViewModel ViewModel { get; set; }
         internal WagViewModel ViewModel { get; set; }
 
         /// <summary>
@@ -67,13 +71,28 @@
 
         private void filterTextChanged(object sender, TextChangedEventArgs e)
         {
-            ViewModel.TailViewModel.FilterText = ViewModel.Highlight ? "" : xfilterTextBox.Text;
+            ViewModel.TailViewModel.FilterText = ViewModel.Highlight ? string.Empty : xfilterTextBox.Text;
+            LogEntry.SearchString = ViewModel.Highlight ? xfilterTextBox.Text : string.Empty;
         }
 
         private void ClearFilterClick(object sender, RoutedEventArgs e)
         {
-            xfilterTextBox.Text = "";
-            ViewModel.TailViewModel.FilterText = "";
+            xfilterTextBox.Text = string.Empty;
+            ViewModel.TailViewModel.FilterText = string.Empty;
+            LogEntry.SearchString = string.Empty;
+        }
+
+        private void XfilterTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            filterTextChanged(sender, null);
+        }
+
+        private void XfilterTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Tab)
+            {
+                filterTextChanged(sender, null);
+            }
         }
     }
 }
